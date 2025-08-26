@@ -1,0 +1,2101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>✨ Magic Letters - Learn & Trace</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@300;400;600;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --accent-gradient: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            --success-gradient: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+            --glow-blue: #4facfe;
+            --glow-pink: #ff6b9d;
+            --glow-yellow: #ffd93d;
+            --shadow-soft: 0 20px 40px rgba(0,0,0,0.1);
+            --shadow-glow: 0 0 30px rgba(79, 172, 254, 0.3);
+        }
+
+        body {
+            font-family: 'Fredoka', cursive;
+            background: var(--primary-gradient);
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+
+        /* PWA styles for mobile app-like experience */
+        @media (display-mode: standalone) {
+            body {
+                -webkit-app-region: drag;
+            }
+        }
+
+        /* Animated Background */
+        .animated-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -2;
+            background: linear-gradient(-45deg, #667eea, #764ba2, #f093fb, #f5576c);
+            background-size: 400% 400%;
+            animation: gradientShift 15s ease infinite;
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Floating Elements */
+        .floating-elements {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        .floating-element {
+            position: absolute;
+            font-size: 2rem;
+            opacity: 0.1;
+            animation: floatAround 20s linear infinite;
+            color: white;
+        }
+
+        @keyframes floatAround {
+            0% {
+                transform: translateY(100vh) rotate(0deg);
+                opacity: 0;
+            }
+            10% { opacity: 0.1; }
+            90% { opacity: 0.1; }
+            100% {
+                transform: translateY(-100px) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        /* Game States */
+        .game-state {
+            display: none;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        .game-state.active {
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Main Menu */
+        .main-menu {
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .logo {
+            margin-bottom: 3rem;
+            animation: logoGlow 3s ease-in-out infinite alternate;
+        }
+
+        .logo h1 {
+            font-size: 4rem;
+            font-weight: 700;
+            background: linear-gradient(45deg, #ffd93d, #ff6b9d, #4facfe);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 0 30px rgba(255, 255, 255, 0.5);
+            margin-bottom: 1rem;
+        }
+
+        .logo p {
+            font-size: 1.5rem;
+            color: white;
+            opacity: 0.9;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        @keyframes logoGlow {
+            0% { filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.5)); }
+            100% { filter: drop-shadow(0 0 30px rgba(255, 255, 255, 0.8)); }
+        }
+
+        .menu-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .menu-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            padding: 1.5rem 3rem;
+            border-radius: 50px;
+            color: white;
+            font-size: 1.5rem;
+            font-weight: 600;
+            font-family: 'Fredoka', cursive;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: var(--shadow-soft);
+            position: relative;
+            overflow: hidden;
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .menu-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .menu-btn:hover::before {
+            left: 100%;
+        }
+
+        .menu-btn:hover,
+        .menu-btn:focus {
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 30px 60px rgba(0,0,0,0.2);
+            outline: none;
+        }
+
+        .play-btn {
+            background: linear-gradient(135deg, #ff6b9d 0%, #ffd93d 100%);
+            font-size: 2rem;
+            padding: 2rem 4rem;
+            animation: pulseGlow 2s ease-in-out infinite;
+        }
+
+        @keyframes pulseGlow {
+            0%, 100% { box-shadow: 0 0 20px rgba(255, 107, 157, 0.5); }
+            50% { box-shadow: 0 0 40px rgba(255, 107, 157, 0.8); }
+        }
+
+        /* Game Screen */
+        .game-screen {
+            padding: 1rem;
+        }
+
+        .game-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            padding: 1rem 2rem;
+            border-radius: 20px;
+            box-shadow: var(--shadow-soft);
+        }
+
+        .back-btn {
+            background: linear-gradient(135deg, #ff6b9d, #ff8a80);
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 25px;
+            color: white;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .progress-container {
+            flex: 1;
+            margin: 0 2rem;
+            position: relative;
+        }
+
+        .progress-bar {
+            background: rgba(255,255,255,0.2);
+            height: 20px;
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-fill {
+            background: linear-gradient(90deg, #4facfe, #00f2fe);
+            height: 100%;
+            border-radius: 10px;
+            transition: width 0.5s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .progress-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            animation: shimmer 2s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .stars-container {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .star {
+            font-size: 1.5rem;
+            color: #ffd93d;
+            filter: drop-shadow(0 0 5px rgba(255, 217, 61, 0.5));
+            animation: starTwinkle 1.5s ease-in-out infinite alternate;
+        }
+
+        @keyframes starTwinkle {
+            0% { opacity: 0.5; transform: scale(0.8); }
+            100% { opacity: 1; transform: scale(1.1); }
+        }
+
+        .game-content {
+            display: flex;
+            gap: 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .letter-selector {
+            background: rgba(255,255,255,0.95);
+            border-radius: 25px;
+            padding: 2rem;
+            box-shadow: var(--shadow-soft);
+            backdrop-filter: blur(10px);
+            width: 300px;
+            height: fit-content;
+        }
+
+        .category-tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .category-tab {
+            background: linear-gradient(135deg, #f093fb, #f5576c);
+            border: none;
+            padding: 0.8rem 1.2rem;
+            border-radius: 20px;
+            color: white;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            flex: 1;
+            text-align: center;
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .category-tab.active {
+            background: linear-gradient(135deg, #4facfe, #00f2fe);
+            transform: scale(1.05);
+        }
+
+        .letters-grid {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 0.8rem;
+            max-height: 400px;
+            overflow-y: auto;
+            padding-right: 0.5rem;
+        }
+
+        .letter-btn {
+            background: linear-gradient(135deg, #ffecd2, #fcb69f);
+            border: none;
+            padding: 1rem;
+            border-radius: 15px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .letter-btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: radial-gradient(circle, rgba(255,255,255,0.8), transparent 70%);
+            transition: all 0.3s ease;
+            transform: translate(-50%, -50%);
+            border-radius: 50%;
+        }
+
+        .letter-btn:hover::before {
+            width: 100px;
+            height: 100px;
+        }
+
+        .letter-btn:hover {
+            transform: translateY(-3px) rotate(3deg);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+
+        .letter-btn.active {
+            background: linear-gradient(135deg, #4facfe, #00f2fe);
+            color: white;
+            transform: scale(1.1);
+            box-shadow: var(--shadow-glow);
+        }
+
+        .letter-btn.completed {
+            background: linear-gradient(135deg, #a8edea, #fed6e3);
+            position: relative;
+        }
+
+        .letter-btn.completed::after {
+            content: '✓';
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #4caf50;
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+        }
+
+        /* Canvas Area */
+        .canvas-area {
+            flex: 1;
+            background: rgba(255,255,255,0.95);
+            border-radius: 25px;
+            padding: 2rem;
+            box-shadow: var(--shadow-soft);
+            backdrop-filter: blur(10px);
+        }
+
+        .current-letter-display {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .current-letter {
+            font-size: 4rem;
+            font-weight: 700;
+            background: linear-gradient(45deg, #4facfe, #00f2fe);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: letterGlow 2s ease-in-out infinite alternate;
+            cursor: pointer;
+            display: inline-block;
+            transition: transform 0.3s ease;
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .current-letter:hover,
+        .current-letter:focus {
+            transform: scale(1.1);
+            outline: none;
+        }
+
+        @keyframes letterGlow {
+            0% { filter: drop-shadow(0 0 10px rgba(79, 172, 254, 0.5)); }
+            100% { filter: drop-shadow(0 0 20px rgba(79, 172, 254, 0.8)); }
+        }
+
+        .canvas-container {
+            position: relative;
+            display: flex;
+            justify-content: center;
+            margin-bottom: 2rem;
+        }
+
+        #tracingCanvas {
+            border: 3px solid #e3f2fd;
+            border-radius: 20px;
+            cursor: crosshair;
+            background: linear-gradient(135deg, #ffffff 0%, #f8f9ff 100%);
+            box-shadow: inset 0 2px 10px rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+            touch-action: none;
+        }
+
+        #tracingCanvas:hover {
+            border-color: #4facfe;
+            box-shadow: inset 0 2px 10px rgba(0,0,0,0.05), 0 0 20px rgba(79, 172, 254, 0.3);
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .action-btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 25px;
+            color: white;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .action-btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255,255,255,0.3);
+            border-radius: 50%;
+            transition: all 0.4s ease;
+            transform: translate(-50%, -50%);
+        }
+
+        .action-btn:hover::before {
+            width: 200px;
+            height: 200px;
+        }
+
+        .action-btn:hover,
+        .action-btn:focus {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+            outline: none;
+        }
+
+        .action-btn.clear-btn {
+            background: linear-gradient(135deg, #ff6b9d, #ff8a80);
+        }
+
+        .action-btn.hint-btn {
+            background: linear-gradient(135deg, #ffd93d, #ffb74d);
+        }
+
+        .action-btn.next-btn {
+            background: linear-gradient(135deg, #4caf50, #8bc34a);
+        }
+
+        .action-btn.check-btn {
+            background: linear-gradient(135deg, #2196f3, #03dac6);
+            font-size: 1.3rem;
+            padding: 1.2rem 2.5rem;
+        }
+
+        /* Feedback System */
+        .feedback-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.3s ease;
+        }
+
+        .feedback-overlay.show {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .feedback-card {
+            background: white;
+            padding: 3rem;
+            border-radius: 30px;
+            text-align: center;
+            box-shadow: var(--shadow-soft);
+            transform: scale(0.5);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            max-width: 400px;
+            width: 90%;
+        }
+
+        .feedback-overlay.show .feedback-card {
+            transform: scale(1);
+        }
+
+        .feedback-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            animation: bounceIn 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .feedback-title {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            background: linear-gradient(45deg, #4facfe, #00f2fe);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .feedback-message {
+            font-size: 1.2rem;
+            color: #666;
+            margin-bottom: 2rem;
+        }
+
+        .feedback-btn {
+            background: linear-gradient(135deg, #4facfe, #00f2fe);
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 25px;
+            color: white;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .feedback-btn:hover,
+        .feedback-btn:focus {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+            outline: none;
+        }
+
+        @keyframes bounceIn {
+            0% { transform: scale(0); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+
+        /* Celebration Effects */
+        .celebration {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 999;
+        }
+
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background: #ffd93d;
+            animation: confettiFall 3s ease-out forwards;
+        }
+
+        @keyframes confettiFall {
+            0% {
+                transform: translateY(-100vh) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(100vh) rotate(720deg);
+                opacity: 0;
+            }
+        }
+
+        /* Stats Panel */
+        .stats-panel {
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 1rem;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 1rem;
+            background: rgba(255,255,255,0.1);
+            border-radius: 15px;
+            backdrop-filter: blur(5px);
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: white;
+            display: block;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .stat-label {
+            color: rgba(255,255,255,0.8);
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+        }
+
+        /* Hint Animation */
+        .hint-path {
+            stroke: #ffd93d;
+            stroke-width: 8;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            fill: none;
+            filter: drop-shadow(0 0 10px rgba(255, 217, 61, 0.8));
+            stroke-dasharray: 2000;
+            stroke-dashoffset: 2000;
+        }
+
+        .hint-path.animate {
+            animation: drawPath 3s ease-in-out forwards;
+        }
+
+        @keyframes drawPath {
+            to {
+                stroke-dashoffset: 0;
+            }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .game-content {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .letter-selector {
+                width: 100%;
+                order: 2;
+            }
+            
+            .canvas-area {
+                order: 1;
+            }
+            
+            .letters-grid {
+                grid-template-columns: repeat(8, 1fr);
+                max-height: 200px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .logo h1 {
+                font-size: 3rem;
+            }
+            
+            .menu-btn {
+                font-size: 1.2rem;
+                padding: 1.2rem 2rem;
+            }
+            
+            .play-btn {
+                font-size: 1.5rem;
+                padding: 1.5rem 3rem;
+            }
+            
+            .current-letter {
+                font-size: 3rem;
+            }
+            
+            .letters-grid {
+                grid-template-columns: repeat(6, 1fr);
+            }
+            
+            #tracingCanvas {
+                width: 100%;
+                max-width: 400px;
+            }
+
+            .action-buttons {
+                justify-content: space-around;
+            }
+
+            .action-btn {
+                padding: 0.8rem 1.2rem;
+                font-size: 0.9rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .game-content {
+                padding: 0.5rem;
+            }
+            
+            .canvas-area,
+            .letter-selector {
+                padding: 1rem;
+            }
+            
+            .action-buttons {
+                gap: 0.5rem;
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .action-btn {
+                padding: 1rem 1.5rem;
+                font-size: 1rem;
+                width: 200px;
+            }
+            
+            .letters-grid {
+                grid-template-columns: repeat(5, 1fr);
+                gap: 0.5rem;
+            }
+
+            .game-header {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+
+            .progress-container {
+                margin: 0;
+                width: 100%;
+            }
+        }
+
+        /* Loading Screen */
+        .loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--primary-gradient);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease;
+        }
+
+        .loading-screen.hide {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .loading-spinner {
+            width: 60px;
+            height: 60px;
+            border: 6px solid rgba(255,255,255,0.3);
+            border-top: 6px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 2rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            color: white;
+            font-size: 1.5rem;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        /* PWA Install Prompt */
+        .install-prompt {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            right: 20px;
+            background: white;
+            padding: 1rem;
+            border-radius: 15px;
+            box-shadow: var(--shadow-soft);
+            display: none;
+            align-items: center;
+            gap: 1rem;
+            z-index: 1001;
+        }
+
+        .install-prompt.show {
+            display: flex;
+        }
+
+        .install-btn {
+            background: var(--primary-gradient);
+            border: none;
+            color: white;
+            padding: 0.8rem 1.5rem;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .close-install {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #999;
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div class="loading-screen" id="loadingScreen">
+        <div class="loading-spinner"></div>
+        <div class="loading-text">Loading Magic Letters...</div>
+    </div>
+
+    <!-- PWA Install Prompt -->
+    <div class="install-prompt" id="installPrompt">
+        <div>
+            <strong>Install Magic Letters</strong><br>
+            <small>Add to home screen for the best experience!</small>
+        </div>
+        <button class="install-btn" id="installBtn">Install</button>
+        <button class="close-install" id="closeInstall">×</button>
+    </div>
+
+    <!-- Animated Background -->
+    <div class="animated-bg"></div>
+    
+    <!-- Floating Elements -->
+    <div class="floating-elements" id="floatingElements"></div>
+    
+    <!-- Main Menu -->
+    <div class="game-state active main-menu" id="mainMenu">
+        <div class="logo">
+            <h1>✨ Magic Letters</h1>
+            <p>Learn, Trace & Master the Alphabet!</p>
+        </div>
+        
+        <div class="menu-buttons">
+            <button class="menu-btn play-btn" onclick="startGame()">
+                🎮 Start Playing
+            </button>
+            <button class="menu-btn" onclick="showLevels()">
+                📊 Levels
+            </button>
+            <button class="menu-btn" onclick="showSettings()">
+                ⚙️ Settings
+            </button>
+        </div>
+    </div>
+    
+    <!-- Game Screen -->
+    <div class="game-state game-screen" id="gameScreen">
+        <div class="game-header">
+            <button class="back-btn" onclick="goHome()">← Back</button>
+            <div class="progress-container">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+                </div>
+            </div>
+            <div class="stars-container" id="starsContainer">
+                <span class="star">⭐</span>
+                <span class="star">⭐</span>
+                <span class="star">⭐</span>
+            </div>
+        </div>
+        
+        <div class="stats-panel">
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <span class="stat-value" id="accuracy">0%</span>
+                    <div class="stat-label">Accuracy</div>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-value" id="attempts">0</span>
+                    <div class="stat-label">Attempts</div>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-value" id="completed">0</span>
+                    <div class="stat-label">Completed</div>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-value" id="streak">0</span>
+                    <div class="stat-label">Streak</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="game-content">
+            <div class="letter-selector">
+                <div class="category-tabs">
+                    <button class="category-tab active" data-category="uppercase" onclick="switchCategory('uppercase')">ABC</button>
+                    <button class="category-tab" data-category="lowercase" onclick="switchCategory('lowercase')">abc</button>
+                    <button class="category-tab" data-category="numbers" onclick="switchCategory('numbers')">123</button>
+                    <button class="category-tab" data-category="shapes" onclick="switchCategory('shapes')">🔺</button>
+                </div>
+                <div class="letters-grid" id="lettersGrid">
+                    <!-- Letters will be populated by JavaScript -->
+                </div>
+            </div>
+            
+            <div class="canvas-area">
+                <div class="current-letter-display">
+                    <div class="current-letter" id="currentLetter" onclick="playSound()">A</div>
+                    <p>Click the letter to hear its sound!</p>
+                </div>
+                
+                <div class="canvas-container">
+                    <canvas id="tracingCanvas" width="600" height="400"></canvas>
+                </div>
+                
+                <div class="action-buttons">
+                    <button class="action-btn clear-btn" onclick="clearCanvas()">
+                        🗑️ Clear
+                    </button>
+                    <button class="action-btn hint-btn" onclick="showHint()">
+                        💡 Show Me How
+                    </button>
+                    <button class="action-btn next-btn" onclick="nextLetter()">
+                        ⏭️ Next
+                    </button>
+                    <button class="action-btn check-btn" onclick="checkTracing()">
+                        ✅ Check My Work
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Feedback Overlay -->
+    <div class="feedback-overlay" id="feedbackOverlay">
+        <div class="feedback-card">
+            <div class="feedback-icon" id="feedbackIcon">🎉</div>
+            <div class="feedback-title" id="feedbackTitle">Excellent!</div>
+            <div class="feedback-message" id="feedbackMessage">Perfect tracing! You're doing great!</div>
+            <button class="feedback-btn" onclick="closeFeedback()">Continue</button>
+        </div>
+    </div>
+    
+    <!-- Celebration Container -->
+    <div class="celebration" id="celebration"></div>
+
+    <script>
+        // Game Data
+        const gameData = {
+            uppercase: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split(''),
+            lowercase: 'abcdefghijklmnopqrstuvwxyz'.split(''),
+            numbers: '0123456789'.split(''),
+            shapes: ['🔴', '🔵', '🟢', '🟡', '🔺', '🔸', '⭐', '❤️', '🟦', '🟧']
+        };
+
+        // Same pronunciation for capital and small letters
+const letterSounds = {
+    'A': 'ay', 'a': 'ay',
+    'B': 'bee', 'b': 'bee',
+    'C': 'see', 'c': 'see',
+    'D': 'dee', 'd': 'dee',
+    'E': 'ee', 'e': 'ee',
+    'F': 'ef', 'f': 'ef',
+    'G': 'jee', 'g': 'jee',
+    'H': 'aych', 'h': 'aych',
+    'I': 'eye', 'i': 'eye',
+    'J': 'jay', 'j': 'jay',
+    'K': 'kay', 'k': 'kay',
+    'L': 'el', 'l': 'el',
+    'M': 'em', 'm': 'em',
+    'N': 'en', 'n': 'en',
+    'O': 'oh', 'o': 'oh',
+    'P': 'pee', 'p': 'pee',
+    'Q': 'cue', 'q': 'cue',
+    'R': 'ar', 'r': 'ar',
+    'S': 'es', 's': 'es',
+    'T': 'tee', 't': 'tee',
+    'U': 'you', 'u': 'you',
+    'V': 'vee', 'v': 'vee',
+    'W': 'double-you', 'w': 'double-you',
+    'X': 'ex', 'x': 'ex',
+    'Y': 'why', 'y': 'why',
+    'Z': 'zee', 'z': 'zee',
+
+    // Numbers
+    '0': 'zero',
+    '1': 'one',
+    '2': 'two',
+    '3': 'three',
+    '4': 'four',
+    '5': 'five',
+    '6': 'six',
+    '7': 'seven',
+    '8': 'eight',
+    '9': 'nine'
+};
+
+
+        // Shape sounds
+        const shapeSounds = {
+            '🔴': 'red circle', '🔵': 'blue circle', '🟢': 'green circle', '🟡': 'yellow circle',
+            '🔺': 'triangle', '🔸': 'diamond', '⭐': 'star', '❤️': 'heart',
+            '🟦': 'blue square', '🟧': 'orange square'
+        };
+
+        // Drawing paths for hints
+        const drawingPaths = {
+            'A': [
+                {x: 300, y: 350, type: 'move'},
+                {x: 250, y: 100, type: 'line'},
+                {x: 350, y: 100, type: 'line'},
+                {x: 300, y: 350, type: 'line'},
+                {x: 275, y: 225, type: 'move'},
+                {x: 325, y: 225, type: 'line'}
+            ],
+            'B': [
+                {x: 250, y: 100, type: 'move'},
+                {x: 250, y: 350, type: 'line'},
+                {x: 320, y: 350, type: 'line'},
+                {x: 340, y: 330, type: 'line'},
+                {x: 340, y: 240, type: 'line'},
+                {x: 320, y: 225, type: 'line'},
+                {x: 250, y: 225, type: 'line'},
+                {x: 320, y: 225, type: 'move'},
+                {x: 330, y: 210, type: 'line'},
+                {x: 330, y: 120, type: 'line'},
+                {x: 320, y: 100, type: 'line'},
+                {x: 250, y: 100, type: 'line'}
+            ],
+            // Add more letter paths as needed
+            '🔴': [
+                {x: 300, y: 150, type: 'move'},
+                {x: 350, y: 175, type: 'curve'},
+                {x: 375, y: 225, type: 'curve'},
+                {x: 350, y: 275, type: 'curve'},
+                {x: 300, y: 300, type: 'curve'},
+                {x: 250, y: 275, type: 'curve'},
+                {x: 225, y: 225, type: 'curve'},
+                {x: 250, y: 175, type: 'curve'},
+                {x: 300, y: 150, type: 'curve'}
+            ]
+        };
+
+        // Game State
+        let currentCategory = 'uppercase';
+        let currentLetter = 'A';
+        let currentIndex = 0;
+        let canvas, ctx;
+        let isDrawing = false;
+        let userPath = [];
+        let completedLetters = new Set();
+        let hintAnimation = null;
+        
+        // Stats
+        let stats = {
+            accuracy: 0,
+            attempts: 0,
+            completed: 0,
+            streak: 0,
+            totalAccuracy: 0
+        };
+
+        // Voice synthesis
+        let synth = window.speechSynthesis;
+        let voices = [];
+        let childVoice = null;
+
+        // PWA support
+        let deferredPrompt;
+
+        // Initialize game
+        document.addEventListener('DOMContentLoaded', function() {
+            // Show loading screen briefly
+            setTimeout(() => {
+                document.getElementById('loadingScreen').classList.add('hide');
+            }, 1500);
+
+            createFloatingElements();
+            loadVoices();
+            setupPWA();
+            
+            // Initialize canvas when game starts
+            setTimeout(() => {
+                if (document.getElementById('tracingCanvas')) {
+                    initCanvas();
+                }
+            }, 100);
+
+            // Prevent zoom on double tap for mobile
+            let lastTouchEnd = 0;
+            document.addEventListener('touchend', function (event) {
+                const now = (new Date()).getTime();
+                if (now - lastTouchEnd <= 300) {
+                    event.preventDefault();
+                }
+                lastTouchEnd = now;
+            }, false);
+        });
+
+        function setupPWA() {
+            window.addEventListener('beforeinstallprompt', (e) => {
+                e.preventDefault();
+                deferredPrompt = e;
+                document.getElementById('installPrompt').classList.add('show');
+            });
+
+            document.getElementById('installBtn').addEventListener('click', async () => {
+                if (deferredPrompt) {
+                    deferredPrompt.prompt();
+                    const { outcome } = await deferredPrompt.userChoice;
+                    console.log(`User response to the install prompt: ${outcome}`);
+                    deferredPrompt = null;
+                    document.getElementById('installPrompt').classList.remove('show');
+                }
+            });
+
+            document.getElementById('closeInstall').addEventListener('click', () => {
+                document.getElementById('installPrompt').classList.remove('show');
+            });
+        }
+
+        function loadVoices() {
+    voices = synth.getVoices();
+
+    // Look for female Indian voices only
+    childVoice = voices.find(voice =>
+        voice.name.includes('Google हिन्दी') || // Some browsers list Hindi as option
+        voice.name.includes('Google भारतीय अंग्रेज़ी') ||
+        voice.name.includes('Google Indian English Female') ||
+        (voice.lang.toLowerCase().includes('en-in') && voice.name.toLowerCase().includes('female'))
+    );
+
+    // Fallback: pick ANY Indian English voice (male or female) if no female is found
+    if (!childVoice) {
+        childVoice = voices.find(voice => voice.lang.toLowerCase().includes('en-in'));
+    }
+
+    // If still no match, fallback to English female
+    if (!childVoice) {
+        childVoice = voices.find(voice =>
+            voice.name.includes('Female') && voice.lang.toLowerCase().startsWith('en')
+        ) || voices[0];
+    }
+
+    // Handle case where voices are not loaded yet
+    if (voices.length === 0) {
+        synth.onvoiceschanged = () => loadVoices();
+    }
+}
+
+function createFloatingElements() {
+    const container = document.getElementById('floatingElements');
+    const elements = ['🌟', '✨', '🎨', '📝', '🎯', '🏆', '🎪', '🎭', '🔤', '🔡'];
+    
+    for (let i = 0; i < 15; i++) {
+        const element = document.createElement('div');
+        element.className = 'floating-element';
+        element.textContent = elements[Math.floor(Math.random() * elements.length)];
+        element.style.left = Math.random() * 100 + '%';
+        element.style.animationDelay = Math.random() * 20 + 's';
+        element.style.animationDuration = (15 + Math.random() * 10) + 's';
+        container.appendChild(element);
+    }
+}
+
+function startGame() {
+    document.getElementById('mainMenu').classList.remove('active');
+    document.getElementById('gameScreen').classList.add('active');
+    
+    // Initialize canvas and game
+    setTimeout(() => {
+        initCanvas();
+        populateLetters();
+        drawCurrentLetter();
+        updateProgress();
+        updateStats();
+    }, 100);
+}
+
+function goHome() {
+    document.getElementById('gameScreen').classList.remove('active');
+    document.getElementById('mainMenu').classList.add('active');
+}
+
+function showLevels() {
+    alert('🎯 Levels coming soon! More challenges await!');
+}
+
+function showSettings() {
+    alert('⚙️ Settings coming soon! Customize your experience!');
+}
+
+function initCanvas() {
+    canvas = document.getElementById('tracingCanvas');
+    if (!canvas) return;
+    
+    ctx = canvas.getContext('2d');
+    
+    // Canvas event listeners
+    canvas.addEventListener('mousedown', startDrawing);
+    canvas.addEventListener('mousemove', draw);
+    canvas.addEventListener('mouseup', stopDrawing);
+    canvas.addEventListener('mouseout', stopDrawing);
+    
+    // Touch events for mobile
+    canvas.addEventListener('touchstart', handleTouch, {passive: false});
+    canvas.addEventListener('touchmove', handleTouch, {passive: false});
+    canvas.addEventListener('touchend', stopDrawing, {passive: false});
+    
+    // Resize canvas for mobile
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
+}
+
+function resizeCanvas() {
+    if (!canvas) return;
+    
+    const container = canvas.parentElement;
+    const maxWidth = Math.min(600, container.clientWidth - 40);
+    const maxHeight = Math.min(400, window.innerHeight * 0.4);
+    
+    canvas.width = maxWidth;
+    canvas.height = maxHeight;
+    canvas.style.width = maxWidth + 'px';
+    canvas.style.height = maxHeight + 'px';
+    
+    if (ctx) {
+        drawCurrentLetter();
+    }
+}
+
+function populateLetters() {
+    const grid = document.getElementById('lettersGrid');
+    if (!grid) return;
+    
+    grid.innerHTML = '';
+    
+    gameData[currentCategory].forEach((letter, index) => {
+        const btn = document.createElement('button');
+        btn.className = 'letter-btn';
+        if (completedLetters.has(letter)) {
+            btn.classList.add('completed');
+        }
+        if (index === currentIndex) {
+            btn.classList.add('active');
+        }
+        btn.textContent = letter;
+        btn.onclick = () => selectLetter(letter, index);
+        grid.appendChild(btn);
+    });
+}
+
+function switchCategory(category) {
+    currentCategory = category;
+    currentIndex = 0;
+    currentLetter = gameData[category][0];
+    
+    // Update tab appearance
+    document.querySelectorAll('.category-tab').forEach(tab => {
+        tab.classList.toggle('active', tab.dataset.category === category);
+    });
+    
+    populateLetters();
+    updateCurrentLetterDisplay();
+    drawCurrentLetter();
+    clearCanvas();
+}
+
+function selectLetter(letter, index) {
+    currentLetter = letter;
+    currentIndex = index;
+    
+    updateCurrentLetterDisplay();
+    populateLetters();
+    drawCurrentLetter();
+    clearCanvas();
+    playSound();
+}
+
+function updateCurrentLetterDisplay() {
+    const display = document.getElementById('currentLetter');
+    if (display) {
+        display.textContent = currentLetter;
+    }
+}
+
+function drawCurrentLetter() {
+    if (!ctx || !canvas) return;
+    
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    
+    // Draw guide letter/shape
+    ctx.save();
+    
+    if (currentCategory === 'shapes') {
+        // For shapes, draw emoji
+        ctx.font = `${Math.min(canvas.width, canvas.height) * 0.4}px Arial`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillStyle = 'rgba(79, 172, 254, 0.3)';
+        ctx.fillText(currentLetter, canvas.width / 2, canvas.height / 2);
+        
+        // Draw outline for tracing
+        ctx.strokeStyle = 'rgba(79, 172, 254, 0.6)';
+        ctx.lineWidth = 4;
+        ctx.setLineDash([10, 10]);
+        ctx.strokeText(currentLetter, canvas.width / 2, canvas.height / 2);
+        ctx.setLineDash([]);
+    } else {
+        // For letters and numbers
+        ctx.font = `${Math.min(canvas.width, canvas.height) * 0.6}px Fredoka`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.strokeStyle = 'rgba(79, 172, 254, 0.3)';
+        ctx.lineWidth = 8;
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+        
+        const x = canvas.width / 2;
+        const y = canvas.height / 2;
+        
+        // Add glow effect
+        ctx.shadowColor = 'rgba(79, 172, 254, 0.5)';
+        ctx.shadowBlur = 20;
+        ctx.strokeText(currentLetter, x, y);
+        
+        // Draw dotted guide
+        ctx.shadowBlur = 0;
+        ctx.setLineDash([15, 15]);
+        ctx.strokeStyle = 'rgba(79, 172, 254, 0.6)';
+        ctx.lineWidth = 4;
+        ctx.strokeText(currentLetter, x, y);
+        ctx.setLineDash([]);
+    }
+    
+    ctx.restore();
+}
+
+function startDrawing(e) {
+    isDrawing = true;
+    userPath = [];
+    
+    const rect = canvas.getBoundingClientRect();
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+    const x = (e.clientX - rect.left) * scaleX;
+    const y = (e.clientY - rect.top) * scaleY;
+    
+    userPath.push({x, y, timestamp: Date.now()});
+    
+    // Clear any hint animation
+    if (hintAnimation) {
+        cancelAnimationFrame(hintAnimation);
+        hintAnimation = null;
+    }
+}
+
+function draw(e) {
+    if (!isDrawing) return;
+    
+    const rect = canvas.getBoundingClientRect();
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+    const x = (e.clientX - rect.left) * scaleX;
+    const y = (e.clientY - rect.top) * scaleY;
+    
+    userPath.push({x, y, timestamp: Date.now()});
+    
+    // Draw user's trace with enhanced visual feedback
+    ctx.save();
+    ctx.strokeStyle = '#ff6b9d';
+    ctx.lineWidth = 8;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    ctx.shadowColor = '#ff6b9d';
+    ctx.shadowBlur = 15;
+    
+    const len = userPath.length;
+    if (len >= 2) {
+        ctx.beginPath();
+        ctx.moveTo(userPath[len-2].x, userPath[len-2].y);
+        ctx.lineTo(x, y);
+        ctx.stroke();
+    }
+    
+    ctx.restore();
+}
+
+function stopDrawing() {
+    isDrawing = false;
+}
+
+function handleTouch(e) {
+    e.preventDefault();
+    const touch = e.touches[0] || e.changedTouches[0];
+    const mouseEvent = new MouseEvent(
+        e.type === 'touchstart' ? 'mousedown' : 
+        e.type === 'touchmove' ? 'mousemove' : 'mouseup',
+        {
+            clientX: touch.clientX,
+            clientY: touch.clientY
+        }
+    );
+    canvas.dispatchEvent(mouseEvent);
+}
+
+function clearCanvas() {
+    userPath = [];
+    if (hintAnimation) {
+        cancelAnimationFrame(hintAnimation);
+        hintAnimation = null;
+    }
+    drawCurrentLetter();
+}
+
+function showHint() {
+    // Animated drawing demonstration
+    const path = drawingPaths[currentLetter];
+    if (!path) {
+        // Fallback: highlight the letter/shape
+        ctx.save();
+        ctx.strokeStyle = '#ffd93d';
+        ctx.lineWidth = 6;
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+        ctx.shadowColor = '#ffd93d';
+        ctx.shadowBlur = 20;
+        
+        let opacity = 0;
+        let increasing = true;
+        
+        const animateHighlight = () => {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            drawCurrentLetter();
+            
+            ctx.save();
+            ctx.globalAlpha = opacity;
+            if (currentCategory === 'shapes') {
+                ctx.font = `${Math.min(canvas.width, canvas.height) * 0.4}px Arial`;
+            } else {
+                ctx.font = `${Math.min(canvas.width, canvas.height) * 0.6}px Fredoka`;
+            }
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.strokeText(currentLetter, canvas.width / 2, canvas.height / 2);
+            ctx.restore();
+            
+            if (increasing) {
+                opacity += 0.05;
+                if (opacity >= 1) increasing = false;
+            } else {
+                opacity -= 0.05;
+                if (opacity <= 0) increasing = true;
+            }
+            
+            if (opacity > -0.1) {
+                hintAnimation = requestAnimationFrame(animateHighlight);
+            }
+        };
+        
+        animateHighlight();
+        ctx.restore();
+    } else {
+        // Draw the path step by step
+        let step = 0;
+        const drawStep = () => {
+            if (step < path.length) {
+                const point = path[step];
+                ctx.save();
+                ctx.strokeStyle = '#ffd93d';
+                ctx.lineWidth = 8;
+                ctx.lineCap = 'round';
+                ctx.shadowColor = '#ffd93d';
+                ctx.shadowBlur = 15;
+                
+                if (step === 0 || point.type === 'move') {
+                    ctx.beginPath();
+                    ctx.moveTo(point.x, point.y);
+                } else {
+                    ctx.lineTo(point.x, point.y);
+                    ctx.stroke();
+                }
+                
+                ctx.restore();
+                step++;
+                hintAnimation = setTimeout(drawStep, 300);
+            }
+        };
+        drawStep();
+    }
+    
+    // Play encouraging sound
+    playEncourageSound();
+}
+
+function nextLetter() {
+    const letters = gameData[currentCategory];
+    currentIndex = (currentIndex + 1) % letters.length;
+    currentLetter = letters[currentIndex];
+    
+    updateCurrentLetterDisplay();
+    populateLetters();
+    drawCurrentLetter();
+    clearCanvas();
+    updateProgress();
+}
+
+function checkTracing() {
+    stats.attempts++;
+    
+    // Enhanced accuracy calculation for autism-friendly feedback
+    const accuracy = calculateAccuracy();
+    stats.totalAccuracy += accuracy;
+    stats.accuracy = Math.round(stats.totalAccuracy / stats.attempts);
+    
+    let feedback = {};
+    
+    if (accuracy >= 70) {  // Lower threshold for better encouragement
+        stats.completed++;
+        stats.streak++;
+        completedLetters.add(currentLetter);
+        feedback = {
+            icon: '🌟',
+            title: 'Amazing Work!',
+            message: `Great job tracing ${currentLetter}! You earned ${accuracy}% accuracy!`,
+            type: 'excellent'
+        };
+        createCelebration();
+        playSuccessSound();
+        
+        // Auto-play the letter sound after success - with proper delay to avoid collision
+        setTimeout(() => {
+            if (synth && !synth.speaking) { // Only play if not currently speaking
+                playSound();
+            }
+        }, 2500); // Increased delay to ensure appreciation finishes first
+    } else if (accuracy >= 50) {
+        stats.streak = Math.max(0, stats.streak - 1);
+        feedback = {
+            icon: '👏',
+            title: 'Good Try!',
+            message: `You're getting better! Keep practicing ${currentLetter}!`,
+            type: 'good'
+        };
+        playGoodSound();
+    } else if (accuracy >= 30) {
+        stats.streak = 0;
+        feedback = {
+            icon: '💪',
+            title: 'Keep Going!',
+            message: `Practice makes perfect! Try tracing ${currentLetter} again!`,
+            type: 'okay'
+        };
+        playEncourageSound();
+    } else {
+        stats.streak = 0;
+        feedback = {
+            icon: '🎯',
+            title: 'Let\'s Try Again!',
+            message: `You can do it! Let me show you how to trace ${currentLetter}!`,
+            type: 'retry'
+        };
+        playTryAgainSound();
+        
+        // Auto-show hint after poor attempt
+        setTimeout(() => {
+            showHint();
+        }, 2000);
+    }
+    
+    showFeedback(feedback);
+    updateStats();
+    populateLetters(); // Update completed status
+}
+
+function calculateAccuracy() {
+    if (userPath.length === 0) return 0;
+    
+    // More forgiving accuracy calculation for autism-friendly experience
+    const pathLength = userPath.length;
+    const minExpectedLength = 20;
+    const maxExpectedLength = 100;
+    
+    // Length score (more forgiving)
+    let lengthScore = 100;
+    if (pathLength < minExpectedLength) {
+        lengthScore = (pathLength / minExpectedLength) * 80;
+    } else if (pathLength > maxExpectedLength) {
+        lengthScore = Math.max(60, 100 - ((pathLength - maxExpectedLength) * 0.5));
+    }
+    
+    // Coverage score - check if user drew in different areas
+    const canvas_width = canvas.width;
+    const canvas_height = canvas.height;
+    const gridSize = 50;
+    const grid = {};
+    
+    userPath.forEach(point => {
+        const gridX = Math.floor(point.x / gridSize);
+        const gridY = Math.floor(point.y / gridSize);
+        grid[`${gridX},${gridY}`] = true;
+    });
+    
+    const coveredCells = Object.keys(grid).length;
+    const coverageScore = Math.min(100, (coveredCells / 6) * 100); // Expect at least 6 grid cells
+    
+    // Smoothness score (less strict)
+    let smoothnessScore = 100;
+    let sharpTurns = 0;
+    
+    for (let i = 2; i < Math.min(userPath.length, 50); i += 2) { // Check every other point
+        const p1 = userPath[i-2];
+        const p2 = userPath[i-1];
+        const p3 = userPath[i];
+        
+        const angle1 = Math.atan2(p2.y - p1.y, p2.x - p1.x);
+        const angle2 = Math.atan2(p3.y - p2.y, p3.x - p2.x);
+        const angleDiff = Math.abs(angle1 - angle2);
+        
+        if (angleDiff > Math.PI / 3) { // Allow sharper turns
+            sharpTurns++;
+        }
+    }
+    
+    smoothnessScore = Math.max(40, 100 - (sharpTurns * 5));
+    
+    // Final score with weighted components (more forgiving)
+    const finalScore = Math.round(
+        lengthScore * 0.3 + 
+        coverageScore * 0.4 + 
+        smoothnessScore * 0.3
+    );
+    
+    return Math.max(0, Math.min(100, finalScore));
+}
+
+function showFeedback(feedback) {
+    const overlay = document.getElementById('feedbackOverlay');
+    const icon = document.getElementById('feedbackIcon');
+    const title = document.getElementById('feedbackTitle');
+    const message = document.getElementById('feedbackMessage');
+    
+    icon.textContent = feedback.icon;
+    title.textContent = feedback.title;
+    message.textContent = feedback.message;
+    
+    overlay.classList.add('show');
+    
+    // Auto-close feedback after 3 seconds for better flow
+    setTimeout(() => {
+        if (overlay.classList.contains('show')) {
+            closeFeedback();
+        }
+    }, 3000);
+}
+
+function closeFeedback() {
+    document.getElementById('feedbackOverlay').classList.remove('show');
+}
+
+function updateStats() {
+    document.getElementById('accuracy').textContent = stats.accuracy + '%';
+    document.getElementById('attempts').textContent = stats.attempts;
+    document.getElementById('completed').textContent = stats.completed;
+    document.getElementById('streak').textContent = stats.streak;
+}
+
+function updateProgress() {
+    const totalLetters = gameData[currentCategory].length;
+    const progress = (stats.completed / totalLetters) * 100;
+    document.getElementById('progressFill').style.width = Math.min(progress, 100) + '%';
+}
+
+function createCelebration() {
+    const celebration = document.getElementById('celebration');
+    const colors = ['#ffd93d', '#ff6b9d', '#4facfe', '#00f2fe', '#a8edea', '#fed6e3'];
+    
+    for (let i = 0; i < 30; i++) {
+        const confetti = document.createElement('div');
+        confetti.className = 'confetti';
+        confetti.style.left = Math.random() * 100 + '%';
+        confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+        confetti.style.animationDelay = Math.random() * 1 + 's';
+        confetti.style.animationDuration = (2 + Math.random() * 1.5) + 's';
+        celebration.appendChild(confetti);
+        
+        setTimeout(() => confetti.remove(), 4000);
+    }
+}
+
+// Enhanced sound functions for autism-friendly experience - FIXED VERSION
+function playSound() {
+    if (synth && synth.speaking) {
+        synth.cancel();
+    }
+
+    let textToSpeak = currentLetter;
+
+    if (currentCategory === 'shapes') {
+        textToSpeak = shapeSounds[currentLetter] || currentLetter;
+    } else if (letterSounds[currentLetter]) {
+        textToSpeak = letterSounds[currentLetter];
+    }
+
+    const utterance = new SpeechSynthesisUtterance(textToSpeak);
+
+    if (childVoice) {
+        utterance.voice = childVoice;
+    }
+
+    utterance.pitch = 1.1;
+    utterance.rate = 0.95;
+    utterance.volume = 1.0;
+
+    synth.speak(utterance);
+}
+
+function playSuccessSound() {
+    // Cancel any ongoing speech to prevent collision
+    if (synth && synth.speaking) {
+        synth.cancel();
+    }
+    
+    const phrases = [
+        "Excellent work!", "You did it!", "Amazing job!", "Perfect!",
+        "Wonderful!", "You're a star!", "Great job!", "Fantastic!"
+    ];
+    speakPhrase(phrases[Math.floor(Math.random() * phrases.length)]);
+}
+
+function playGoodSound() {
+    // Cancel any ongoing speech to prevent collision
+    if (synth && synth.speaking) {
+        synth.cancel();
+    }
+    
+    const phrases = [
+        "Good try!", "Keep it up!", "You're doing well!", "Nice work!",
+        "Getting better!", "Good job!", "Well done!"
+    ];
+    speakPhrase(phrases[Math.floor(Math.random() * phrases.length)]);
+}
+
+function playEncourageSound() {
+    // Cancel any ongoing speech to prevent collision
+    if (synth && synth.speaking) {
+        synth.cancel();
+    }
+    
+    const phrases = [
+        "You can do it!", "Keep trying!", "Don't give up!", "Practice makes perfect!",
+        "You're learning!", "Try again!", "Keep going!"
+    ];
+    speakPhrase(phrases[Math.floor(Math.random() * phrases.length)]);
+}
+
+function playTryAgainSound() {
+    // Cancel any ongoing speech to prevent collision
+    if (synth && synth.speaking) {
+        synth.cancel();
+    }
+    
+    const phrases = [
+        "Let's try again!", "No worries, try once more!", "Practice time!",
+        "Let me help you!", "We can do this together!"
+    ];
+    speakPhrase(phrases[Math.floor(Math.random() * phrases.length)]);
+}
+
+function speakPhrase(phrase) {
+    // Ensure clean speech queue
+    if (synth && synth.speaking) {
+        synth.cancel();
+    }
+    
+    // Add a small delay to ensure clean start
+    setTimeout(() => {
+        const utterance = new SpeechSynthesisUtterance(phrase);
+        
+        if (childVoice) {
+            utterance.voice = childVoice;
+        }
+        
+        utterance.rate = 0.9;
+        utterance.pitch = 1.1;
+        utterance.volume = 0.7;
+        
+        synth.speak(utterance);
+    }, 100); // Small delay to ensure clean speech queue
+}
+
+// Accessibility improvements
+document.addEventListener('keydown', function(e) {
+    switch(e.key) {
+        case ' ':
+            e.preventDefault();
+            playSound();
+            break;
+        case 'Enter':
+            e.preventDefault();
+            if (document.getElementById('gameScreen').classList.contains('active')) {
+                checkTracing();
+            }
+            break;
+        case 'Escape':
+            e.preventDefault();
+            clearCanvas();
+            break;
+        case 'ArrowRight':
+            e.preventDefault();
+            nextLetter();
+            break;
+        case 'ArrowLeft':
+            e.preventDefault();
+            const letters = gameData[currentCategory];
+            currentIndex = (currentIndex - 1 + letters.length) % letters.length;
+            currentLetter = letters[currentIndex];
+            updateCurrentLetterDisplay();
+            populateLetters();
+            drawCurrentLetter();
+            clearCanvas();
+            updateProgress();
+            break;
+        case 'h':
+        case 'H':
+            e.preventDefault();
+            showHint();
+            break;
+    }
+});
+
+// Touch gestures for mobile
+let touchStartX = 0;
+let touchStartY = 0;
+
+document.addEventListener('touchstart', function(e) {
+    touchStartX = e.touches[0].clientX;
+    touchStartY = e.touches[0].clientY;
+}, { passive: true });
+
+document.addEventListener('touchend', function(e) {
+    if (!e.changedTouches) return;
+    
+    const touchEndX = e.changedTouches[0].clientX;
+    const touchEndY = e.changedTouches[0].clientY;
+    const deltaX = touchEndX - touchStartX;
+    const deltaY = touchEndY - touchStartY;
+    
+    // Minimum swipe distance
+    if (Math.abs(deltaX) < 50 && Math.abs(deltaY) < 50) return;
+    
+    // Only process swipes if not on canvas
+    if (e.target.id === 'tracingCanvas') return;
+    
+    // Horizontal swipes
+    if (Math.abs(deltaX) > Math.abs(deltaY)) {
+        if (deltaX > 0) {
+            // Swipe right - next letter
+            nextLetter();
+        } else {
+            // Swipe left - previous letter
+            const letters = gameData[currentCategory];
+            currentIndex = (currentIndex - 1 + letters.length) % letters.length;
+            currentLetter = letters[currentIndex];
+            updateCurrentLetterDisplay();
+            populateLetters();
+            drawCurrentLetter();
+            clearCanvas();
+            updateProgress();
+        }
+    }
+}, { passive: true });
+
+// Auto-save progress
+function saveProgress() {
+    const progress = {
+        stats: stats,
+        completedLetters: Array.from(completedLetters),
+        currentCategory: currentCategory,
+        currentLetter: currentLetter,
+        currentIndex: currentIndex
+    };
+    // Note: localStorage not available in Claude artifacts
+    // localStorage.setItem('magicLettersProgress', JSON.stringify(progress));
+}
+
+function loadProgress() {
+    // Note: localStorage not available in Claude artifacts
+    // const saved = localStorage.getItem('magicLettersProgress');
+    // if (saved) {
+    //     try {
+    //         const progress = JSON.parse(saved);
+    //         stats = { ...stats, ...progress.stats };
+    //         completedLetters = new Set(progress.completedLetters || []);
+    //         if (progress.currentCategory) {
+    //             currentCategory = progress.currentCategory;
+    //             currentLetter = progress.currentLetter || gameData[currentCategory][0];
+    //             currentIndex = progress.currentIndex || 0;
+    //         }
+    //     } catch (e) {
+    //         console.log('Could not load saved progress');
+    //     }
+    // }
+}
+
+// Auto-save on important actions
+function autoSave() {
+    setTimeout(saveProgress, 100);
+}
+
+// Add auto-save calls to key functions
+const originalCheckTracing = checkTracing;
+checkTracing = function() {
+    originalCheckTracing();
+    autoSave();
+};
+
+const originalSwitchCategory = switchCategory;
+switchCategory = function(category) {
+    originalSwitchCategory(category);
+    autoSave();
+};
+
+// Load progress on startup
+document.addEventListener('DOMContentLoaded', function() {
+    loadProgress();
+});
+
+// Service Worker registration for PWA
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', function() {
+        navigator.serviceWorker.register('/sw.js')
+            .then(function(registration) {
+                console.log('SW registered: ', registration);
+            })
+            .catch(function(registrationError) {
+                console.log('SW registration failed: ', registrationError);
+            });
+    });
+}
+
+// Performance optimization: throttle drawing
+let lastDraw = 0;
+const DRAW_THROTTLE = 16; // ~60fps
+
+const originalDraw = draw;
+draw = function(e) {
+    const now = Date.now();
+    if (now - lastDraw > DRAW_THROTTLE) {
+        originalDraw(e);
+        lastDraw = now;
+    }
+};
+
+// Enhanced mobile support
+function setupMobileOptimizations() {
+    // Prevent double-tap zoom
+    let lastTouchEnd = 0;
+    document.addEventListener('touchend', function(event) {
+        const now = (new Date()).getTime();
+        if (now - lastTouchEnd <= 300) {
+            event.preventDefault();
+        }
+        lastTouchEnd = now;
+    }, false);
+
+    // Handle device orientation changes
+    window.addEventListener('orientationchange', function() {
+        setTimeout(() => {
+            resizeCanvas();
+            drawCurrentLetter();
+        }, 100);
+    });
+
+    // Optimize for different screen densities
+    const ratio = window.devicePixelRatio || 1;
+    if (ratio > 1 && canvas) {
+        const displayWidth = canvas.offsetWidth;
+        const displayHeight = canvas.offsetHeight;
+        
+        canvas.width = displayWidth * ratio;
+        canvas.height = displayHeight * ratio;
+        canvas.style.width = displayWidth + 'px';
+        canvas.style.height = displayHeight + 'px';
+        
+        ctx.scale(ratio, ratio);
+    }
+}
+
+// Initialize mobile optimizations
+setTimeout(setupMobileOptimizations, 500);
+
+// Add haptic feedback for supported devices
+function vibrate(pattern = [100]) {
+    if ('vibrate' in navigator) {
+        navigator.vibrate(pattern);
+    }
+}
+
+// Add vibration to success feedback
+const originalShowFeedback = showFeedback;
+showFeedback = function(feedback) {
+    originalShowFeedback(feedback);
+    if (feedback.type === 'excellent') {
+        vibrate([100, 50, 100]);
+    } else if (feedback.type === 'good') {
+        vibrate([100]);
+    }
+};
+
+    </script>
+</body>
+</html>
